@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Print Count Stats feature.
+ */
+
+include_once 'print_count_stats.features.inc';
