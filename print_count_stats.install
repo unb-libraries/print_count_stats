@@ -1,0 +1,40 @@
+<?php
+
+function print_count_stats_schema() {
+	$schema['print_count_stats_counter'] = array(
+		'description' => t('Tracks print counts on a monthly basis'),
+		'fields' => array(
+			'nid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 0,
+				'description' => t('Printer node id'),
+			),
+			'month' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 0,
+				'description' => t('Month'),
+			),
+			'year' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 0,
+				'description' => t('Year'),
+			)
+		),
+		'primary key' => array('nid', 'month', 'year'),
+		'indexes' => array(
+			'nid' => array('nid')
+		),
+	);
+	
+	return $schema;
+}
+
+function print_count_stats_uninstall() {
+	drupal_uninstall_schema('print_count_stats');
+}
