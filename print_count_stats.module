@@ -56,6 +56,10 @@ function _print_count_stats_page() {
   $nids = _get_enabled_printer_nids();
   $nodes = entity_load('node', $nids);
 
+  if(count($nids) == 0) {
+    return '<p>No printers defined.</p>';
+  }
+
   $rows  = array();
   $months = array();
 
