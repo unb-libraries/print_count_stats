@@ -42,6 +42,18 @@ function print_count_stats_schema() {
 	return $schema;
 }
 
+function print_count_stats_install(){
+	$opts = variable_get('node_options_library_printer')
+	if ( $opts == NULL) {
+		variable_set('node_options_library_printer', array('status'));
+    }
+    elseif (in_array('promote', $opts)) {
+		$key = array_search('promote', $opts);
+		unset($ops[$key]);
+		variable_set('node_options_library_printer', $opts);
+    }
+}
+
 function print_count_stats_uninstall() {
 	drupal_uninstall_schema('print_count_stats');
 }
