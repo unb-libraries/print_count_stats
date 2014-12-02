@@ -43,7 +43,7 @@ function print_count_stats_schema() {
 }
 
 function print_count_stats_enable(){
-	$opts = variable_get('node_options_library_printer')
+	$opts = variable_get('node_options_library_printer');
 	if ( $opts == NULL) {
 		variable_set('node_options_library_printer', array('status'));
     }
