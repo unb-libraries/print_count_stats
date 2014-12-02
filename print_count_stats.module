@@ -107,6 +107,8 @@ function _get_enabled_printer_nids() {
   return $nids;
 }
 
-function library_printer_delete($node) {
-	db_query("DELETE from {print_count_stats_counter} WHERE nid = :nid", array(':nid'=>$node->nid));
+function node_content_delete($node) {
+  if($node->type == 'library_printer') {
+    db_query("DELETE FROM {print_count_stats_counter} WHERE nid = :nid", array(':nid'=>$node->nid));
+  }
 }
