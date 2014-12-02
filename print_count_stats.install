@@ -62,6 +62,8 @@ function print_count_stats_enable(){
 		unset($ops[$key]);
 		variable_set('node_options_library_printer', $opts);
     }
+
+    variable_set('comment_library_printer', 0);
 }
 
 function print_count_stats_uninstall() {
