@@ -39,6 +39,17 @@ function _access_print_count_stats() {
   return user_access('administer print count stats');
 }
 
+function print_count_stats_node_access($node, $op, $account) {
+  $type = is_string($node) ? $node : $node->type;
+  var_dump($type);
+  if( $type == 'library_printer' ) {
+    if( user_access('administer print count stats') ) {
+      return NODE_ACCESS_ALLOW;
+    }
+  }
+  return NODE_ACCESS_IGNORE;
+}
+
 /**
  * Custom page callback function
  */
