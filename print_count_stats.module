@@ -43,28 +43,51 @@ function _access_print_count_stats() {
  * Custom page callback function
  */
 function _print_count_stats_page() {
-  $nodes = node_load_multiple(array(), array('type' => 'library_printer'));
+  $nids = _get_enabled_printer_nids();
+  $nodes = entity_load('node', $nids);
+
   $rows  = array();
   $months = array();
+
+  $results = db_query("SELECT DISTINCT(CONCAT_WS('-',year,month)) as month_display FROM {print_count_stats_counter} WHERE nid IN (:nids) ORDER BY month_display", array(':nids' => $nids));
+  $i = 0;
+  foreach( $results->fetchCol(0) as $month ) {
+  	$months[ $month ] = $i++;
+  }
 
   foreach( $nodes as $node ) {
   	$lib_id = field_get_items('node', $node, 'field_library');
   	$lib = field_view_value( 'node', $node, 'field_library', $lib_id[0]);
-  	$totals = array();
-  	$diffs  = array();
+  	$totals = array_fill_keys( array_values($months), 0);
+  	$diffs  = array_fill_keys( array_values($months), 0);
   	$prev   = 0;
-  	$results = db_query('SELECT * FROM {print_count_stats_counter} WHERE nid = :nid ORDER BY year, month', array(':nid' => $node->nid));
+  	$results = db_query("SELECT *, CONCAT_WS('-',year,month) as month_display FROM {print_count_stats_counter} WHERE nid = :nid ORDER BY month_display", array(':nid' => $node->nid));
   	foreach( $results as $result ) {
-  		$months[ $result->year . '-' . $result->month ] = 1;
   		$count = $result->counter;
 
-  		$totals[] = $count;
-  		$diffs[] = $count - $prev;
+  		$totals[$months[$result->month_display]] = $count;
+  		$diffs[$months[$result->month_display]] = $count - $prev;
   		$prev = $count;
   	}
-   	$rows[] = array( 'data' => array_merge( array( array( 'data' => $node->title . '<br/><i style="font-weight:normal;">' . $lib['#title'] . '</i>', 'rowspan' => 2, 'header' => 1), 'Total' ), $totals ));
+   	$rows[] = array( 'data' => array_merge( array( array( 'data' => l($node->title, drupal_get_path_alias('node/' . $node->nid)) . '<br/><i style="font-weight:normal;">' . $lib['#title'] . '</i>', 'rowspan' => 2, 'header' => 1), 'Total' ), $totals ));
   	$rows[] = array( 'data' => array_merge( array( 'Diff' ), $diffs ));
   }
   $output = theme('table', array( 'header' => array_merge( array(t('Printer'), '' ), array_keys($months)), 'rows' => $rows ));
   return $output;
+}
+
+function _get_enabled_printer_nids() {
+  $query = new EntityFieldQuery();
+  $results = $query->entityCondition('entity_type', 'node')
+    ->propertyCondition('type','library_printer')
+    ->fieldCondition('field_enabled', 'value', 1)
+    ->propertyOrderBy('title', 'ASC')
+    ->execute();
+
+  $nids = array();
+  if (isset($results['node'])) {
+    $nids = array_keys($results['node']);
+  }
+
+  return $nids;
 }
