@@ -24,6 +24,13 @@ function print_count_stats_schema() {
 				'not null' => TRUE,
 				'default' => 0,
 				'description' => t('Year'),
+			),
+			'counter' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 0,
+				'description' => t('Count'),
 			)
 		),
 		'primary key' => array('nid', 'month', 'year'),
