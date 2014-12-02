@@ -26,8 +26,8 @@ function print_count_stats_menu() {
  */
 function print_count_stats_permission() {
   return array(
-    'view print count stats' => array(
-      'title' => t('View Print Count Stats')
+    'administer print count stats' => array(
+      'title' => t('Administer Print Count Stats')
     )
   );
 }
@@ -36,7 +36,7 @@ function print_count_stats_permission() {
  * Access callback for permission to view print count stats.
  */
 function _access_print_count_stats() {
-  return user_access('view print count stats');
+  return user_access('administer print count stats');
 }
 
 /**

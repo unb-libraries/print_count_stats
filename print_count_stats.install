@@ -42,6 +42,16 @@ function print_count_stats_schema() {
 	return $schema;
 }
 
+function print_count_stats_install(){
+	$role_name = 'Administer Print Count Stats';
+	if(!user_role_load_by_name($role_name)){
+		$role = new stdClass();
+		$role->name = $role_name;
+		user_role_save($role);
+		user_role_grant_permissions($role->rid, array('administer print count stats'));
+	}
+}
+
 function print_count_stats_enable(){
 	$opts = variable_get('node_options_library_printer');
 	if ( $opts == NULL) {
