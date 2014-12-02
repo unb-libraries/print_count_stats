@@ -70,7 +70,7 @@ function print_count_stats_field_default_field_instances() {
         'label' => 'above',
         'module' => 'list',
         'settings' => array(),
-        'type' => 'list_default',
+        'type' => 'list_key',
         'weight' => 2,
       ),
       'teaser' => array(
