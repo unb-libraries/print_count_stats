@@ -63,7 +63,7 @@ function _print_count_stats_page() {
   $rows  = array();
   $months = array();
 
-  $results = db_query("SELECT DISTINCT(CONCAT_WS('-',year,LPAD(month,2,'0'))) as month_display FROM {print_count_stats_counter} WHERE nid IN (:nids) ORDER BY month_display", array(':nids' => $nids));
+  $results = db_query("SELECT DISTINCT(CONCAT_WS('-',year,LPAD(month,2,'0'))) as month_display FROM {print_count_stats_counter} WHERE nid IN (:nids) ORDER BY month_display LIMIT 6", array(':nids' => $nids));
   $i = 0;
   foreach( $results->fetchCol(0) as $month ) {
   	$months[ $month ] = $i++;
@@ -75,7 +75,7 @@ function _print_count_stats_page() {
   	$totals = array_fill_keys( array_values($months), 0);
   	$diffs  = array_fill_keys( array_values($months), 0);
   	$prev   = 0;
-  	$results = db_query("SELECT *, CONCAT_WS('-',year,LPAD(month,2,'0')) as month_display FROM {print_count_stats_counter} WHERE nid = :nid ORDER BY month_display", array(':nid' => $node->nid));
+  	$results = db_query("SELECT *, CONCAT_WS('-',year,LPAD(month,2,'0')) as month_display FROM {print_count_stats_counter} WHERE nid = :nid ORDER BY month_display LIMIT 6", array(':nid' => $node->nid));
   	foreach( $results as $result ) {
   		$count = $result->counter;
 
