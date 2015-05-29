@@ -17,6 +17,11 @@ function print_count_stats_menu() {
     'access callback' => '_access_print_count_stats',
     'expanded' => TRUE
   );
+  $items['print_count_stats/download'] = array(
+    'type'            => MENU_CALLBACK,
+    'page callback'   => '_generate_stats_csv',
+    'access callback' => '_access_print_count_stats'
+  );
 
   return $items;
 }
@@ -87,7 +92,50 @@ function _print_count_stats_page() {
   	$rows[] = array( 'data' => array_merge( array( 'Diff' ), $diffs ));
   }
   $output = theme('table', array( 'header' => array_merge( array(t('Printer'), '' ), array_keys($months)), 'rows' => $rows ));
+  $output .= '<p style="margin-top:1em;"><a href="/print_count_stats/download">Download Spreadsheet</a></p>';
   return $output;
+}
+
+function _generate_stats_csv() {
+  $nids = _get_enabled_printer_nids();
+  $nodes = entity_load('node', $nids);
+
+  header( 'Content-Type: text/csv' );
+  header( 'Content-Disposition: attachment; filename="printers.csv"' );
+
+  if(count($nids) == 0) {
+    print '"No printers defined."';
+    return;
+  }
+
+  $rows  = array();
+  $months = array();
+
+  $results = db_query("SELECT DISTINCT(CONCAT_WS('-',year,LPAD(month,2,'0'))) as month_display FROM {print_count_stats_counter} WHERE nid IN (:nids) ORDER BY month_display", array(':nids' => $nids));
+  $i = 0;
+  foreach( $results->fetchCol(0) as $month ) {
+    $months[ $month ] = $i++;
+  }
+
+  print join( ',', array_merge( array(t('"Printer"'), '' ), array_keys($months)) ) . "\n";
+
+  foreach( $nodes as $node ) {
+    $lib_id = field_get_items('node', $node, 'field_library');
+    $lib = field_view_value( 'node', $node, 'field_library', $lib_id[0]);
+    $totals = array_fill_keys( array_values($months), 0);
+    $diffs  = array_fill_keys( array_values($months), 0);
+    $prev   = 0;
+    $results = db_query("SELECT *, CONCAT_WS('-',year,LPAD(month,2,'0')) as month_display FROM {print_count_stats_counter} WHERE nid = :nid ORDER BY month_display", array(':nid' => $node->nid));
+    foreach( $results as $result ) {
+      $count = $result->counter;
+
+      $totals[$months[$result->month_display]] = $count;
+      $diffs[$months[$result->month_display]] = $count - $prev;
+      $prev = $count;
+    }
+    print '"' . $node->title . ' [' . $lib['#title'] . ']","Total",' . join(',', array_values($totals)) . "\n";
+    print '"","Diff",' . join(',', array_values($diffs)) . "\n";
+  }
 }
 
 function print_count_stats_cron() {
@@ -101,7 +149,7 @@ function print_count_stats_cron() {
 	    $counter = explode( ' ', $counter )[ 1 ];
 	    db_query("INSERT INTO {print_count_stats_counter} (nid,month,year,counter) VALUES (:nid,:month,:year,:counter) ON DUPLICATE KEY UPDATE counter=:counter",
 	    	array(':nid' => $node->nid, ':month' => date('m'), ':year' => date('Y'), ':counter'=> $counter));
-	}
+    }
   }
 }
 
