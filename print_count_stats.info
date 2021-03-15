@@ -3,7 +3,6 @@ description = Manage printers and view print stats
 core = 7.x
 package = UNB Library
 dependencies[] = features
-dependencies[] = library_hours
 dependencies[] = list
 dependencies[] = options
 dependencies[] = taxonomy
